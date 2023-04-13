@@ -28,7 +28,7 @@ Config.enableAnnouncements = true;
  */
 Config.announceMessages = [
   "Enjoy your stay!",
-  "This loadingscreen is made by Exsite"
+  "This is a pre-alpha test. Please report any bugs or errors. Your feedback is valuable to us. Thank you!"
 ];
 
 /**
