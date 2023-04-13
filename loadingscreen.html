@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Garry's Mod Server</title>
+    <style>
+        /* CSS for background image */
+        body {
+            /*background-image: url('https://thegamerstation.com/wp-content/uploads/2022/10/gkapak.jpeg');*/
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: coral;
+        }
+
+        /* CSS for player info and loading bar */
+        #player-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+        }
+
+        #player-info h1 {
+            margin-top: 0;
+            font-size: 48px;
+            text-shadow: 2px 2px #000000;
+        }
+
+        #player-info img {
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            margin-bottom: 16px;
+            box-shadow: 2px 2px #000000;
+        }
+
+        #loading-bar-outer {
+            width: 60%;
+            margin: 32px auto;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        #loading-bar-inner {
+            width: 0%;
+            height: 16px;
+            background-color: #ffffff;
+        }
+
+        #loading-percentage {
+            margin-top: 16px;
+            font-size: 24px;
+            text-shadow: 2px 2px #000000;
+        }
+
+        /* CSS for server rules and map/gamemode */
+        #server-info {
+            position: absolute;
+            bottom: 32px;
+            left: 32px;
+            color: white;
+        }
+
+        #server-info h2 {
+            margin-top: 0;
+            font-size: 24px;
+            text-shadow: 2px 2px #000000;
+        }
+
+        #server-info ul {
+            margin-top: 16px;
+            margin-bottom: 0;
+            padding-left: 24px;
+            font-size: 18px;
+            text-shadow: 2px 2px #000000;
+        }
+
+        #server-info li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="player-info">
+        <h1>Welcome to my Garry's Mod Server!</h1>
+        <img id="avatar" src="" alt="Player Avatar">
+        <h2 id="name"></h2>
+        <div id="loading-bar-outer">
+            <div id="loading-bar-inner"></div>
+        </div>
+        <div id="loading-percentage">0%</div>
+    </div>
+    <div id="server-info">
+        <h2>Server Info</h2>
+        <ul>
+            <li>Map: <span id="map"></span></li>
+            <li>Game Mode: <span id="gamemode"></span></li>
+            <li>Server Rules:</li>
+            <ul>
+                <li>Rule 1</li>
+                <li>Rule 2</li>
+                <li>Rule 3</li>
+            </ul>
+        </ul>
+    </div>
+    <script>
+        // Get the player's Steam ID from the query string
+        const params = new URLSearchParams(window.location.search);
+        const steamId = params.get('steamid');
+
+        // Set the player's Steam profile picture and name
+        const avatar = document.getElementById('avatar');
+        const name = document.getElementById('name');
+        avatar.src = `https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/${steamId.substring(0, 2)}/${steamId}.jpg`;
+        name.textContent = 'Loading...';
+
+        // Fetch the player's Steam profile information
+        fetch(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B8F8550F513D801E22D37034FBD3ED97&steamids=${steamId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Set the player's name
+                name.textContent = data.response.players[0].personaname;
+            })
+            .catch(error => console.error(error));
+
+        // Get the current map and game mode from the server
+        const map = document.getElementById('map');
+        const gamemode = document.getElementById('gamemode');
+        map.textContent = 'Loading...';
+        gamemode.textContent = 'Loading...';
+
+        // Fetch the current map and game mode
+        fetch('/getinfo.php')
+            .then(response => response.json())
+            .then(data => {
+                // Set the current map and game mode
+                map.textContent = data.map;
+                gamemode.textContent = data.gamemode;
+            })
+            .catch(error => console.error(error));
+
+        // Update the loading bar
+        const loadingBar = document.getElementById('loading-bar-inner');
+        const loadingPercentage = document.getElementById('loading-percentage');
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.floor(Math.random() * 10);
+            loadingBar.style.width = `${progress}%`;
+            loadingPercentage.textContent = `${progress}%`;
+
+            if (progress >= 100) {
+                clearInterval(interval);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
